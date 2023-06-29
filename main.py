@@ -5,38 +5,38 @@ from pathvalidate import sanitize_filename
 from urllib.parse import urlparse, unquote, urljoin
 
 
-def parsing_book_page(number):
-    url = f'https://tululu.org/b{number}/'
+def parse_book_page(url):
     response = requests.get(url)
     response.raise_for_status()
     check_for_redirect(response.history)
     soup = BeautifulSoup(response.text, 'lxml')
 
+    book_page = {}
     title_tag = soup.find('head').find('title')
     book_title, author = title_tag.text.split(' - ')
-    book_name = sanitize_filename(book_title)
-    book_author = author.split(',')[0].strip()
+    book_page['title'] = sanitize_filename(book_title)
+    book_page['author'] = author.split(',')[0].strip()
 
     image_tag = soup.find(class_='bookimage').find('img')['src']
-    picture_link = urljoin(url, image_tag)
+    book_page['picture_link'] = urljoin(url, image_tag)
 
-    genre = []
+    books_comments = soup.find_all(class_='texts')
+    book_page['comments'] = [book_comment.find(class_='black').text
+                             for book_comment in books_comments]
+
     book_genre_info = soup.find_all('span', class_='d_book')
     for book in book_genre_info:
         book = book.text.split(': ')[1].replace('.', '').strip()
-        genre.append(book.split(', '))
-
-    books_comments = soup.find_all(class_='texts')
-    if books_comments is not None:
-        comments = [book_comment.find(class_='black').text
-                    for book_comment in books_comments]
-        return book_name, book_author, picture_link, comments, genre[0]
+        book_page['genre'] = (book.split(', '))
+    return book_page
 
 
-def download_txt(number, filename, folder='books/'):
+def download_txt(number, url, filename, folder='books/'):
     os.makedirs("books", exist_ok=True)
-    url = f"https://tululu.org/txt.php?id={number}"
-    response = requests.get(url)
+    params = {
+        'id': f'{number}'
+    }
+    response = requests.get(url, params=params)
     response.raise_for_status()
     check_for_redirect(response.history)
     with open(os.path.join(folder, f'{number}.{filename}.txt'), 'wb') as file:
@@ -65,13 +65,16 @@ def check_for_redirect(response_history):
 
 
 def main():
+    url = 'https://tululu.org'
+    txt_url = urljoin(url, 'txt.php')
     for number in range(1, 11, 1):
         try:
-            filename, author, picture_link, comments, genre = parsing_book_page(number)
-            download_image(number, picture_link, folder='images/')
-            download_txt(number, filename, folder='books/')
+            page_url = urljoin(url, f'b{number}/')
+            book_page = parse_book_page(page_url)
+            download_image(number, book_page['picture_link'], folder='images/')
+            download_txt(number, txt_url, book_page['title'], folder='books/')
         except requests.HTTPError:
-            print(f"Книги {number} нет в каталоге")
+            print(f"Книги {number} нет в каталоге\n")
 
 
 if __name__ == "__main__":
