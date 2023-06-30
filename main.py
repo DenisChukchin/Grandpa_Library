@@ -96,6 +96,10 @@ def main():
                   f"\nКомментарий: {book_page['comments']}", f"\nЖанр: {book_page['genre']}\n")
         except requests.HTTPError:
             print(f"Книга {number} отсутствует в каталоге\n")
+        except requests.exceptions.ConnectionError as error:
+            print(error, "Ошибка соединения")
+        except requests.exceptions.ReadTimeout:
+            print("Превышено время ожидания...")
 
 
 if __name__ == "__main__":
