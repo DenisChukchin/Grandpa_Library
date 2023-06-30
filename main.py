@@ -56,13 +56,12 @@ def download_txt(number, url, filename, folder='books/'):
 
 def download_image(number, picture_link, folder='images/'):
     os.makedirs("images", exist_ok=True)
-    if 'nopic.gif' not in picture_link:
-        response = requests.get(picture_link)
-        response.raise_for_status()
-        check_for_redirect(response.history)
-        picture_extension = get_extension_from_url(picture_link)
-        with open(os.path.join(folder, f'{number}{picture_extension}'), 'wb') as file:
-            file.write(response.content)
+    response = requests.get(picture_link)
+    response.raise_for_status()
+    check_for_redirect(response.history)
+    picture_extension = get_extension_from_url(picture_link)
+    with open(os.path.join(folder, f'{number}{picture_extension}'), 'wb') as file:
+        file.write(response.content)
 
 
 def get_extension_from_url(url):
@@ -109,7 +108,8 @@ def main():
             page_url = urljoin(url, f'b{number}/')
             soup = get_response_from_url(page_url)
             book_page = parse_book_page(soup, page_url)
-            download_image(number, book_page['picture_link'], folder='images/')
+            if 'nopic.gif' not in book_page['picture_link']:
+                download_image(number, book_page['picture_link'], folder='images/')
             download_txt(number, txt_url, book_page['title'], folder='books/')
             print(f"Книга: {book_page['title']}", f"\nАвтор: {book_page['author']}",
                   f"\nКомментарий: {book_page['comments']}", f"\nЖанр: {book_page['genre']}\n")
