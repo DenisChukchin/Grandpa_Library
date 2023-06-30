@@ -1,8 +1,9 @@
-import requests
 import os
+import argparse
+import requests
+from urllib.parse import urlparse, unquote, urljoin
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
-from urllib.parse import urlparse, unquote, urljoin
 
 
 def parse_book_page(url):
@@ -48,6 +49,7 @@ def download_image(number, picture_link, folder='images/'):
     if 'nopic.gif' not in picture_link:
         response = requests.get(picture_link)
         response.raise_for_status()
+        check_for_redirect(response.history)
         picture_extension = get_extension_from_url(picture_link)
         with open(os.path.join(folder, f'{number}{picture_extension}'), 'wb') as file:
             file.write(response.content)
@@ -64,17 +66,36 @@ def check_for_redirect(response_history):
         raise requests.HTTPError
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Укажите интервал книг для загрузки'
+    )
+    parser.add_argument('start_id', type=int,
+                        help='Номер книги с которой начнется загрузка.',
+                        default=1, nargs='?',
+                        metavar='Id книги указано целым числом.')
+    parser.add_argument('end_id', type=int,
+                        help='Номер книги после которой закончится загрузка.',
+                        default=10, nargs='?',
+                        metavar='Id книги указано целым числом.')
+    args = parser.parse_args()
+    return args.start_id, args.end_id + 1
+
+
 def main():
+    start_id, end_id = parse_args()
     url = 'https://tululu.org'
     txt_url = urljoin(url, 'txt.php')
-    for number in range(1, 11, 1):
+    for number in range(start_id, end_id):
         try:
             page_url = urljoin(url, f'b{number}/')
             book_page = parse_book_page(page_url)
             download_image(number, book_page['picture_link'], folder='images/')
             download_txt(number, txt_url, book_page['title'], folder='books/')
+            print(f"Книга: {book_page['title']}", f"\nАвтор: {book_page['author']}",
+                  f"\nКомментарий: {book_page['comments']}", f"\nЖанр: {book_page['genre']}\n")
         except requests.HTTPError:
-            print(f"Книги {number} нет в каталоге\n")
+            print(f"Книга {number} отсутствует в каталоге\n")
 
 
 if __name__ == "__main__":
