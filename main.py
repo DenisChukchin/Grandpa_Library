@@ -7,12 +7,15 @@ from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
 
-def parse_book_page(url):
-    response = requests.get(url)
+def get_response_from_url(page_url):
+    response = requests.get(page_url)
     response.raise_for_status()
     check_for_redirect(response.history)
     soup = BeautifulSoup(response.text, 'lxml')
+    return soup
 
+
+def parse_book_page(soup, page_url):
     book_page = {}
     title_tag = soup.find('head').find('title')
     book_title, author = title_tag.text.split(' - ')
@@ -20,7 +23,7 @@ def parse_book_page(url):
     book_page['author'] = author.split(',')[0].strip()
 
     image_tag = soup.find(class_='bookimage').find('img')['src']
-    book_page['picture_link'] = urljoin(url, image_tag)
+    book_page['picture_link'] = urljoin(page_url, image_tag)
 
     books_comments = soup.find_all(class_='texts')
     book_page['comments'] = [book_comment.find(class_='black').text
@@ -98,7 +101,8 @@ def main():
     for number in range(start_id, end_id):
         try:
             page_url = urljoin(url, f'b{number}/')
-            book_page = parse_book_page(page_url)
+            soup = get_response_from_url(page_url)
+            book_page = parse_book_page(soup, page_url)
             download_image(number, book_page['picture_link'], folder='images/')
             download_txt(number, txt_url, book_page['title'], folder='books/')
             print(f"Книга: {book_page['title']}", f"\nАвтор: {book_page['author']}",
