@@ -30,9 +30,9 @@ def parse_book_page(soup, page_url):
                              for book_comment in books_comments]
 
     book_genre = soup.find_all('span', class_='d_book')
-    for book in book_genre:
-        book = book.text.split(': ')[1].replace('.', '').strip()
-        book_page['genre'] = (book.split(', '))
+    book = [book.text.split(': ')[1].replace('.', '').strip()
+            for book in book_genre]
+    book_page['genre'] = book[0].split(', ')
     return book_page
 
 
