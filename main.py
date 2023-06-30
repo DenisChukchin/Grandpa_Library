@@ -16,23 +16,29 @@ def get_response_from_url(page_url):
 
 
 def parse_book_page(soup, page_url):
-    book_page = {}
     title_tag = soup.find('head').find('title')
     book_title, author = title_tag.text.split(' - ')
-    book_page['title'] = sanitize_filename(book_title)
-    book_page['author'] = author.split(',')[0].strip()
+    title = sanitize_filename(book_title)
+    author = author.split(',')[0].strip()
 
     image_tag = soup.find(class_='bookimage').find('img')['src']
-    book_page['picture_link'] = urljoin(page_url, image_tag)
+    picture_link = urljoin(page_url, image_tag)
 
     books_comments = soup.find_all(class_='texts')
-    book_page['comments'] = [book_comment.find(class_='black').text
-                             for book_comment in books_comments]
+    comments = [book_comment.find(class_='black').text
+                for book_comment in books_comments]
 
     book_genre = soup.find_all('span', class_='d_book')
-    book = [book.text.split(': ')[1].replace('.', '').strip()
-            for book in book_genre]
-    book_page['genre'] = book[0].split(', ')
+    genre = [book.text.split(': ')[1].replace('.', '').strip()
+             for book in book_genre][0].split(', ')
+
+    book_page = {
+        'title': title,
+        'author': author,
+        'picture_link': picture_link,
+        'comments': comments,
+        'genre': genre
+    }
     return book_page
 
 
