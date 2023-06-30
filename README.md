@@ -14,5 +14,8 @@ User need to specify books interval by command:
 ```python
 python3 main.py 20 30
 ```
+<img width="1392" alt="image" src="https://github.com/DenisChukchin/Grandpa_Library/assets/125466667/607cadc0-f8e9-4dd9-876b-243401a63e09">
+
+
 ## Project goals.
 *The program was designed by a student from online web development courses for educational purposes [Devman](https://dvmn.org).*
