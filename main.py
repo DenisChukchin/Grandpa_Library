@@ -2,6 +2,7 @@ import os
 import argparse
 import requests
 from urllib.parse import urlparse, unquote, urljoin
+from time import sleep
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
@@ -106,6 +107,7 @@ def main():
             print(f"Книга {number} отсутствует в каталоге\n")
         except requests.exceptions.ConnectionError as error:
             print(error, "Ошибка соединения")
+            sleep(15)
         except requests.exceptions.ReadTimeout:
             print("Превышено время ожидания...")
 
