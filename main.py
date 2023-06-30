@@ -29,8 +29,8 @@ def parse_book_page(soup, page_url):
     book_page['comments'] = [book_comment.find(class_='black').text
                              for book_comment in books_comments]
 
-    book_genre_info = soup.find_all('span', class_='d_book')
-    for book in book_genre_info:
+    book_genre = soup.find_all('span', class_='d_book')
+    for book in book_genre:
         book = book.text.split(': ')[1].replace('.', '').strip()
         book_page['genre'] = (book.split(', '))
     return book_page
