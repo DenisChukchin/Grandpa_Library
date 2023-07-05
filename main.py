@@ -17,9 +17,15 @@ def get_response_from_url(page_url):
 
 def parse_book_page(soup, page_url):
     title_tag = soup.find('head').find('title')
-    book_title, author = title_tag.text.split(' - ')
-    title = sanitize_filename(book_title)
-    author = author.split(',')[0].strip()
+    title_and_author, *garbage = title_tag.text.split(', ')
+    try:
+        book_title, author = title_and_author.split(' - ')
+        title = sanitize_filename(book_title)
+    except ValueError:
+        title_and_author = title_tag.text.split(' - ')
+        book_title, book_author, *garbage = title_and_author
+        author, *garbage = book_author.split(',')
+        title = sanitize_filename(book_title)
 
     image_tag = soup.find(class_='bookimage').find('img')['src']
     picture_link = urljoin(page_url, image_tag)
@@ -50,8 +56,10 @@ def download_txt(number, url, filename, folder='books/'):
     response = requests.get(url, params=params)
     response.raise_for_status()
     check_for_redirect(response.history)
-    with open(os.path.join(folder, f'{number}.{filename}.txt'), 'wb') as file:
+    txt_path = os.path.join(folder, f'{number}.{filename}.txt')
+    with open(txt_path, 'wb') as file:
         file.write(response.content)
+    return txt_path
 
 
 def download_image(number, picture_link, folder='images/'):
@@ -60,8 +68,10 @@ def download_image(number, picture_link, folder='images/'):
     response.raise_for_status()
     check_for_redirect(response.history)
     picture_extension = get_extension_from_url(picture_link)
-    with open(os.path.join(folder, f'{number}{picture_extension}'), 'wb') as file:
+    image_path = os.path.join(folder, f'{number}{picture_extension}')
+    with open(image_path, 'wb') as file:
         file.write(response.content)
+    return image_path
 
 
 def get_extension_from_url(url):
