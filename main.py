@@ -16,27 +16,19 @@ def get_response_from_url(page_url):
 
 
 def parse_book_page(soup, page_url):
-    title_tag = soup.find('head').find('title')
-    title_and_author, *garbage = title_tag.text.split(', ')
-    try:
-        book_title, author = title_and_author.split(' - ')
-        title = sanitize_filename(book_title)
-    except ValueError:
-        title_and_author = title_tag.text.split(' - ')
-        book_title, book_author, *garbage = title_and_author
-        author, *garbage = book_author.split(',')
-        title = sanitize_filename(book_title)
+    title_tag = soup.select_one('h1').text
+    book_title, book_author = title_tag.split(' :: ')
+    title = sanitize_filename(book_title).strip()
+    author = book_author.strip()
 
-    image_tag = soup.find(class_='bookimage').find('img')['src']
+    image_tag = soup.select_one('.bookimage img')['src']
     picture_link = urljoin(page_url, image_tag)
 
-    books_comments = soup.find_all(class_='texts')
-    comments = [book_comment.find(class_='black').text
-                for book_comment in books_comments]
+    books_comments = soup.select('.texts .black')
+    comments = [book_comment.text for book_comment in books_comments]
 
-    book_genre = soup.find_all('span', class_='d_book')
-    genre = [book.text.split(': ')[1].replace('.', '').strip()
-             for book in book_genre][0].split(', ')
+    book_genre = soup.select('span.d_book a')
+    genre = [book.text for book in book_genre]
 
     book_page = {
         'title': title,

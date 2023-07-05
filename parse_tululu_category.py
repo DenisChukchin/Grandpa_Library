@@ -8,11 +8,8 @@ from main import download_image
 
 
 def get_id(url, page_url):
-    id_tags = page_url.find('div', id='content').find_all(class_='d_book')
-    ids_url = []
-    for id_tag in id_tags:
-        id_url = urljoin(url, id_tag.find('a')['href'])
-        ids_url.append(id_url)
+    id_tags = page_url.select('.d_book .bookimage a')
+    ids_url = [urljoin(url, id_tag['href']) for id_tag in id_tags]
     return ids_url
 
 
