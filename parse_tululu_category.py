@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 from time import sleep
 from parse_tululu import parse_book_page, get_response_from_url
 from parse_tululu import download_image, download_txt
+from print_dict import pd
 
 
 def get_id(url, page_url):
@@ -18,6 +19,13 @@ def save_books_as_json_file(books_description, folder):
     os.makedirs(folder, exist_ok=True)
     with open(os.path.join(folder, 'BOOKS'), 'w', encoding='utf8') as json_file:
         json.dump(books_description, json_file, ensure_ascii=False)
+
+
+def read_json_file(folder):
+    with open(os.path.join(folder, 'BOOKS'), 'r') as json_file:
+        books_json = json_file.read()
+    books = json.loads(books_json)
+    return books
 
 
 def parse_args():
@@ -108,8 +116,6 @@ def main():
                 'comments': book_page['comments'],
                 'genres': book_page['genre'],
             })
-            print(f"Книга {id_number}: {book_page['title']}",
-                  f"Автор: {book_page['author']}")
         except requests.HTTPError:
             print(f"Книга {id_number} отсутствует в каталоге")
         except requests.exceptions.ConnectionError as error:
@@ -121,6 +127,7 @@ def main():
     save_books_as_json_file(books_description,
                             folder=f'{user_folder}/books as json/')
     print(f'Всего скачано книг: {len(books_description)}')
+    pd(read_json_file(folder=f'{user_folder}/books as json/'))
 
 
 if __name__ == "__main__":
