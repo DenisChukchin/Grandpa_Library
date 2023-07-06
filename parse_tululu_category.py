@@ -34,13 +34,11 @@ def parse_args():
     )
     parser.add_argument('--start_page', type=int,
                         help='Номер книги с которой начнется загрузка.',
-                        default=1,
                         metavar='Id книги - целое число.')
     parser.add_argument('--end_page', type=int,
                         help='Номер книги после которой закончится загрузка. '
                              'Если не указать этот параметр, то скачаются ВСЕ '
                              'книги начиная с паметра start_page до конца категории.',
-                        default=2,
                         metavar='Id книги - целое число.')
     parser.add_argument('--dest_folder', type=str, default=os.getcwd(),
                         help='Путь до папки для сохранения книг, обложек '
@@ -56,22 +54,26 @@ def parse_args():
                              'Не скачиваем: --skip_txt, '
                              'Скачиваем: параметр отсутствует.')
     args = parser.parse_args()
-    return args.start_page, args.end_page, args.dest_folder, args.skip_img, args.skip_txt
+    if not args.start_page and not args.end_page:
+        return 1, 2, args.dest_folder, args.skip_img, args.skip_txt
+    else:
+        return args.start_page, args.end_page, args.dest_folder, args.skip_img, args.skip_txt
 
 
 def main():
     url = 'https://tululu.org'
+    science_fiction = 'https://tululu.org/l55/'
     txt_url = urljoin(url, 'txt.php')
 
     start_page, end_page, user_folder, skip_img, skip_txt = parse_args()
     ids_url = []
     try:
-        category_page_url = urljoin(url, f'l55/{start_page}/')
-        soup = get_response_from_url(category_page_url)
+        start_page_url = urljoin(science_fiction, f'{start_page}')
+        soup = get_response_from_url(start_page_url)
         last_page = [(int(soup.select('.npage')[-1].text) + 1)
                      if end_page is None else end_page][0]
         for page in range(start_page, last_page):
-            category_page_url = urljoin(url, f'l55/{page}')
+            category_page_url = urljoin(science_fiction, f'{page}')
             soup = get_response_from_url(category_page_url)
             ids_url.extend(get_id(url, soup))
     except requests.exceptions.ConnectionError as error:
@@ -81,19 +83,20 @@ def main():
         print("Превышено время ожидания...")
 
     books_description = []
-    for number, id_url in enumerate(ids_url):
+    for id_url in ids_url:
+        id_number = id_url.split('b')[1].split('/')[0]
         try:
             soup = get_response_from_url(id_url)
             book_page = parse_book_page(soup, id_url)
             if not skip_img:
-                image_path = (download_image(number, book_page['picture_link'],
+                image_path = (download_image(id_number, book_page['picture_link'],
                               folder=f'{user_folder}/images/')
                               if 'nopic.gif' not in book_page['picture_link']
                               else 'Обложки нет на сайте')
             else:
                 image_path = 'Вы отменили скачивание обложек книг'
             if not skip_txt:
-                txt_path = download_txt(number, txt_url, book_page['title'],
+                txt_path = download_txt(id_number, txt_url, book_page['title'],
                                         folder=f'{user_folder}/books/')
             else:
                 txt_path = 'Вы отменили скачивание книг'
@@ -105,8 +108,10 @@ def main():
                 'comments': book_page['comments'],
                 'genres': book_page['genre'],
             })
+            print(f"Книга {id_number}: {book_page['title']}",
+                  f"Автор: {book_page['author']}")
         except requests.HTTPError:
-            print(f"Книга {number} отсутствует в каталоге")
+            print(f"Книга {id_number} отсутствует в каталоге")
         except requests.exceptions.ConnectionError as error:
             print(error, "Ошибка соединения")
             sleep(15)
@@ -115,6 +120,7 @@ def main():
 
     save_books_as_json_file(books_description,
                             folder=f'{user_folder}/books as json/')
+    print(f'Всего скачано книг: {len(books_description)}')
 
 
 if __name__ == "__main__":
