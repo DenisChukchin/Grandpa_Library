@@ -14,8 +14,8 @@ def get_id(url, page_url):
     return ids_url
 
 
-def save_books_as_json_file(books_description, folder='books_as_json/'):
-    os.makedirs("books_as_json", exist_ok=True)
+def save_books_as_json_file(books_description, folder):
+    os.makedirs(folder, exist_ok=True)
     with open(os.path.join(folder, 'BOOKS'), 'w', encoding='utf8') as json_file:
         json.dump(books_description, json_file, ensure_ascii=False)
 
@@ -37,15 +37,24 @@ def parse_args():
                         help='Номер книги после которой закончится загрузка. ',
                         default=2,
                         metavar='Id книги - целое число.')
+    parser.add_argument('--dest_folder', type=str, default=os.getcwd(),
+                        help='Путь для сохранений обложек, книг и описания книжек',
+                        metavar='Путь до папки')
+    parser.add_argument('--skip_img', action='store_true',
+                        help='Скачиваем или не скачиваем обложки книг. '
+                             'Не скачиваем: --skip_img, Скачиваем: не пишем параметр')
+    parser.add_argument('--skip_txt', action='store_true',
+                        help='Скачиваем или не скачиваем книги. '
+                             'Не скачиваем: --skip_txt, Скачиваем: не пишем параметр')
     args = parser.parse_args()
-    return args.start_page, args.end_page
+    return args.start_page, args.end_page, args.dest_folder, args.skip_img, args.skip_txt
 
 
 def main():
     url = 'https://tululu.org'
     txt_url = urljoin(url, 'txt.php')
 
-    start_page, end_page = parse_args()
+    start_page, end_page, user_folder, skip_img, skip_txt = parse_args()
     ids_url = []
     try:
         category_page_url = urljoin(url, f'l55/{start_page}/')
@@ -67,10 +76,18 @@ def main():
         try:
             soup = get_response_from_url(id_url)
             book_page = parse_book_page(soup, id_url)
-            image_path = (download_image(number, book_page['picture_link'], folder='images/')
-                          if 'nopic.gif' not in book_page['picture_link']
-                          else 'Обложки нет на сайте')
-            txt_path = download_txt(number, txt_url, book_page['title'], folder='books/')
+            if not skip_img:
+                image_path = (download_image(number, book_page['picture_link'],
+                              folder=f'{user_folder}/images/')
+                              if 'nopic.gif' not in book_page['picture_link']
+                              else 'Обложки нет на сайте')
+            else:
+                image_path = 'Вы отменили скачивание обложек книг'
+            if not skip_txt:
+                txt_path = download_txt(number, txt_url, book_page['title'],
+                                        folder=f'{user_folder}/books/')
+            else:
+                txt_path = 'Вы отменили скачивание книг'
             books_description.append({
                 'title': book_page['title'],
                 'author': book_page['author'],
@@ -87,7 +104,8 @@ def main():
         except requests.exceptions.ReadTimeout:
             print("Превышено время ожидания...")
 
-    save_books_as_json_file(books_description, folder='books_as_json/')
+    save_books_as_json_file(books_description,
+                            folder=f'{user_folder}/books as json/')
 
 
 if __name__ == "__main__":

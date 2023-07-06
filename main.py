@@ -40,8 +40,8 @@ def parse_book_page(soup, page_url):
     return book_page
 
 
-def download_txt(number, url, filename, folder='books/'):
-    os.makedirs("books", exist_ok=True)
+def download_txt(number, url, filename, folder):
+    os.makedirs(folder, exist_ok=True)
     params = {
         'id': f'{number}'
     }
@@ -54,8 +54,8 @@ def download_txt(number, url, filename, folder='books/'):
     return txt_path
 
 
-def download_image(number, picture_link, folder='images/'):
-    os.makedirs("images", exist_ok=True)
+def download_image(number, picture_link, folder):
+    os.makedirs(folder, exist_ok=True)
     response = requests.get(picture_link)
     response.raise_for_status()
     check_for_redirect(response.history)
@@ -97,12 +97,14 @@ def parse_args():
                              'Например: 35',
                         default=10, nargs='?',
                         metavar='Id книги - целое число.')
+    parser.add_argument('--dest_folder', type=str, default=os.getcwd(),
+                        help='Путь для сохранений обложек и книг')
     args = parser.parse_args()
-    return args.start_id, args.end_id + 1
+    return args.start_id, args.end_id + 1, args.dest_folder
 
 
 def main():
-    start_id, end_id = parse_args()
+    start_id, end_id, user_folder = parse_args()
     url = 'https://tululu.org'
     txt_url = urljoin(url, 'txt.php')
     for number in range(start_id, end_id):
@@ -111,8 +113,8 @@ def main():
             soup = get_response_from_url(page_url)
             book_page = parse_book_page(soup, page_url)
             if 'nopic.gif' not in book_page['picture_link']:
-                download_image(number, book_page['picture_link'], folder='images/')
-            download_txt(number, txt_url, book_page['title'], folder='books/')
+                download_image(number, book_page['picture_link'], folder=f'{user_folder}/images/')
+            download_txt(number, txt_url, book_page['title'], folder=f'{user_folder}/books/')
             print(f"Книга: {book_page['title']}", f"\nАвтор: {book_page['author']}",
                   f"\nКомментарий: {book_page['comments']}", f"\nЖанр: {book_page['genre']}\n")
         except requests.HTTPError:
