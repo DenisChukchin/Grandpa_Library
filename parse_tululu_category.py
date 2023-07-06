@@ -1,10 +1,11 @@
 import os
 import requests
 import json
+import argparse
 from urllib.parse import urljoin
 from time import sleep
-from main import get_response_from_url, parse_book_page, download_txt
-from main import download_image
+from main import parse_book_page, get_response_from_url
+from main import download_image, download_txt
 
 
 def get_id(url, page_url):
@@ -19,20 +20,48 @@ def save_books_as_json_file(books_description, folder='books_as_json/'):
         json.dump(books_description, json_file, ensure_ascii=False)
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Программа скачает книжки и обложки к ним. '
+                    'На компьютер будет скачан текстовый файл'
+                    'с названиями книг, авторами, жанрами и отзывами. '
+                    'Для работы программы потребуется указать'
+                    ' интервал страниц сайта с книгами для загрузки. '
+                    'По умолчанию скрипт скачает книги со страницы 1. '
+    )
+    parser.add_argument('--start_page', type=int,
+                        help='Номер книги с которой начнется загрузка.',
+                        default=1,
+                        metavar='Id книги - целое число.')
+    parser.add_argument('--end_page', type=int,
+                        help='Номер книги после которой закончится загрузка. ',
+                        default=2,
+                        metavar='Id книги - целое число.')
+    args = parser.parse_args()
+    return args.start_page, args.end_page
+
+
 def main():
     url = 'https://tululu.org'
     txt_url = urljoin(url, 'txt.php')
+
+    start_page, end_page = parse_args()
     ids_url = []
-    for page in range(1, 5):
-        try:
+    try:
+        category_page_url = urljoin(url, f'l55/{start_page}/')
+        soup = get_response_from_url(category_page_url)
+        last_page = [(int(soup.select('.npage')[-1].text) + 1)
+                     if end_page is None else end_page][0]
+        for page in range(start_page, last_page):
             category_page_url = urljoin(url, f'l55/{page}')
-            page_urls = get_response_from_url(category_page_url)
-            ids_url.extend(get_id(url, page_urls))
-        except requests.exceptions.ConnectionError as error:
-            print(error, "Ошибка соединения")
-            sleep(15)
-        except requests.exceptions.ReadTimeout:
-            print("Превышено время ожидания...")
+            soup = get_response_from_url(category_page_url)
+            ids_url.extend(get_id(url, soup))
+    except requests.exceptions.ConnectionError as error:
+        print(error, "Ошибка соединения")
+        sleep(15)
+    except requests.exceptions.ReadTimeout:
+        print("Превышено время ожидания...")
+
     books_description = []
     for number, id_url in enumerate(ids_url):
         try:
