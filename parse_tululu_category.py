@@ -4,8 +4,8 @@ import json
 import argparse
 from urllib.parse import urljoin
 from time import sleep
-from main import parse_book_page, get_response_from_url
-from main import download_image, download_txt
+from parse_tululu import parse_book_page, get_response_from_url
+from parse_tululu import download_image, download_txt
 
 
 def get_id(url, page_url):
@@ -23,29 +23,38 @@ def save_books_as_json_file(books_description, folder):
 def parse_args():
     parser = argparse.ArgumentParser(
         description='Программа скачает книжки и обложки к ним. '
-                    'На компьютер будет скачан текстовый файл'
+                    'На компьютер будет скачан текстовый файл '
                     'с названиями книг, авторами, жанрами и отзывами. '
                     'Для работы программы потребуется указать'
                     ' интервал страниц сайта с книгами для загрузки. '
                     'По умолчанию скрипт скачает книги со страницы 1. '
+                    'По желанию можно указать папку для скачивания. '
+                    'Также можно уточнить скачивать или нет книги'
+                    ' и обложки к ним. '
     )
     parser.add_argument('--start_page', type=int,
                         help='Номер книги с которой начнется загрузка.',
                         default=1,
                         metavar='Id книги - целое число.')
     parser.add_argument('--end_page', type=int,
-                        help='Номер книги после которой закончится загрузка. ',
+                        help='Номер книги после которой закончится загрузка. '
+                             'Если не указать этот параметр, то скачаются ВСЕ '
+                             'книги начиная с паметра start_page до конца категории.',
                         default=2,
                         metavar='Id книги - целое число.')
     parser.add_argument('--dest_folder', type=str, default=os.getcwd(),
-                        help='Путь для сохранений обложек, книг и описания книжек',
+                        help='Путь до папки для сохранения книг, обложек '
+                             'и описания книжек. По умолчанию '
+                             'все скачается в папку со скриптом.',
                         metavar='Путь до папки')
     parser.add_argument('--skip_img', action='store_true',
                         help='Скачиваем или не скачиваем обложки книг. '
-                             'Не скачиваем: --skip_img, Скачиваем: не пишем параметр')
+                             'Не скачиваем: --skip_img, '
+                             'Скачиваем: параметр отсутствует.')
     parser.add_argument('--skip_txt', action='store_true',
                         help='Скачиваем или не скачиваем книги. '
-                             'Не скачиваем: --skip_txt, Скачиваем: не пишем параметр')
+                             'Не скачиваем: --skip_txt, '
+                             'Скачиваем: параметр отсутствует.')
     args = parser.parse_args()
     return args.start_page, args.end_page, args.dest_folder, args.skip_img, args.skip_txt
 

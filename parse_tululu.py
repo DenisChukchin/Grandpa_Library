@@ -86,6 +86,7 @@ def parse_args():
                     ' интервал книг для загрузки. '
                     'По умолчанию скрипт скачает книги '
                     'в интервале с 1 по 10 включительно. '
+                    'По желанию можно указать папку для скачивания.'
     )
     parser.add_argument('start_id', type=int,
                         help='Номер книги с которой начнется загрузка. '
@@ -98,7 +99,9 @@ def parse_args():
                         default=10, nargs='?',
                         metavar='Id книги - целое число.')
     parser.add_argument('--dest_folder', type=str, default=os.getcwd(),
-                        help='Путь для сохранений обложек и книг')
+                        help='Путь для сохранений обложек и книг. '
+                             'По умолчанию все скачается в папку со скриптом.',
+                        metavar='Путь до папки')
     args = parser.parse_args()
     return args.start_id, args.end_id + 1, args.dest_folder
 
