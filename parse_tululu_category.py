@@ -76,7 +76,7 @@ def main():
         start_page_url = urljoin(science_fiction, f'{start_page}')
         soup = get_response_from_url(start_page_url)
         last_page = [(int(soup.select('.npage')[-1].text) + 1)
-                     if end_page is None else end_page][0]
+                     if not end_page else end_page][0]
         for page in range(start_page, last_page):
             category_page_url = urljoin(science_fiction, f'{page}')
             soup = get_response_from_url(category_page_url)
