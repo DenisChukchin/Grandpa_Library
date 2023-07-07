@@ -9,10 +9,10 @@ from parse_tululu import download_image, download_txt
 from print_dict import pd
 
 
-def get_id(url, page_url):
-    id_tags = page_url.select('.d_book .bookimage a')
-    ids_url = [urljoin(url, id_tag['href']) for id_tag in id_tags]
-    return ids_url
+def get_id(url, soup):
+    id_tags = soup.select('.d_book .bookimage a')
+    page_url = [urljoin(url, id_tag['href']) for id_tag in id_tags]
+    return page_url
 
 
 def save_books_as_json_file(books_description, folder):
@@ -71,7 +71,7 @@ def main():
     txt_url = urljoin(url, 'txt.php')
 
     start_page, end_page, user_folder, skip_img, skip_txt = parse_args()
-    ids_url = []
+    page_urls = []
     try:
         start_page_url = urljoin(science_fiction, f'{start_page}')
         soup = get_response_from_url(start_page_url)
@@ -80,7 +80,7 @@ def main():
         for page in range(start_page, last_page):
             category_page_url = urljoin(science_fiction, f'{page}')
             soup = get_response_from_url(category_page_url)
-            ids_url.extend(get_id(url, soup))
+            page_urls.extend(get_id(url, soup))
     except requests.exceptions.ConnectionError as error:
         print(error, "Ошибка соединения")
         sleep(15)
@@ -88,11 +88,11 @@ def main():
         print("Превышено время ожидания...")
 
     books_description = []
-    for id_url in ids_url:
-        id_number = id_url.split('b')[1].split('/')[0]
+    for page_url in page_urls:
+        id_number = page_url.split('b')[1].split('/')[0]
         try:
-            soup = get_response_from_url(id_url)
-            book_page = parse_book_page(soup, id_url)
+            soup = get_response_from_url(page_url)
+            book_page = parse_book_page(soup, page_url)
             if not skip_img:
                 image_path = (download_image(id_number, book_page['picture_link'],
                               folder=f'{user_folder}/images/')
