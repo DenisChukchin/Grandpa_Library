@@ -9,7 +9,7 @@ from parse_tululu import download_image, download_txt
 from print_dict import pd
 
 
-def get_id(url, soup):
+def get_page_url(url, soup):
     id_tags = soup.select('.d_book .bookimage a')
     page_url = [urljoin(url, id_tag['href']) for id_tag in id_tags]
     return page_url
@@ -80,7 +80,7 @@ def main():
         for page in range(start_page, last_page):
             category_page_url = urljoin(science_fiction, f'{page}')
             soup = get_response_from_url(category_page_url)
-            page_urls.extend(get_id(url, soup))
+            page_urls.extend(get_page_url(url, soup))
     except requests.exceptions.ConnectionError as error:
         print(error, "Ошибка соединения")
         sleep(15)
