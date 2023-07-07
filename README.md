@@ -34,7 +34,9 @@ The following parameters are available for the script:
 
 One of the possible commands to use the script:
 ```bash
-% python3 parse_tululu_category.py --start_page 700 --dest_folder /Users/denischukchin/Downloads --skip_img
+% python3 parse_tululu_category.py
 ```
+<img width="1078" alt="image" src="https://github.com/DenisChukchin/Grandpa_Library/assets/125466667/ffebfe20-b6ff-42c7-878b-2df189b76cd0">
+
 ## Project goals.
 *The program was designed by a student from online web development courses for educational purposes [Devman](https://dvmn.org).*
