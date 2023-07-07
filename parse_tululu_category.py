@@ -96,10 +96,11 @@ def main():
             soup = get_response_from_url(page_url)
             book_page = parse_book_page(soup, page_url)
             if not skip_img:
-                image_path = (download_image(id_number, book_page['picture_link'],
-                              folder=f'{user_folder}/images/')
-                              if 'nopic.gif' not in book_page['picture_link']
-                              else 'Обложки нет на сайте')
+                if 'nopic.gif' not in book_page['picture_link']:
+                    image_path = download_image(id_number, book_page['picture_link'],
+                                                folder=f'{user_folder}/images/')
+                else:
+                    image_path = 'Обложки нет на сайте'
             else:
                 image_path = 'Вы отменили скачивание обложек книг'
             if not skip_txt:
