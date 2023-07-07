@@ -40,10 +40,10 @@ def parse_args():
                     'Также можно уточнить скачивать или нет книги'
                     ' и обложки к ним. '
     )
-    parser.add_argument('--start_page', type=int,
+    parser.add_argument('--start_page', type=int, default=1,
                         help='Номер книги с которой начнется загрузка.',
                         metavar='Id книги - целое число.')
-    parser.add_argument('--end_page', type=int,
+    parser.add_argument('--end_page', type=int, default=2,
                         help='Номер книги после которой закончится загрузка. '
                              'Если не указать этот параметр, то скачаются ВСЕ '
                              'книги начиная с паметра start_page до конца категории.',
@@ -62,10 +62,7 @@ def parse_args():
                              'Не скачиваем: --skip_txt, '
                              'Скачиваем: параметр отсутствует.')
     args = parser.parse_args()
-    if not args.start_page and not args.end_page:
-        return 1, 2, args.dest_folder, args.skip_img, args.skip_txt
-    else:
-        return args.start_page, args.end_page, args.dest_folder, args.skip_img, args.skip_txt
+    return args.start_page, args.end_page, args.dest_folder, args.skip_img, args.skip_txt
 
 
 def main():
