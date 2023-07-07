@@ -81,6 +81,8 @@ def main():
             category_page_url = urljoin(science_fiction, f'{page}')
             soup = get_response_from_url(category_page_url)
             page_urls.extend(get_page_url(url, soup))
+    except requests.exceptions.HTTPError:
+        print('В указанном промежутке отсутствуют страницы.')
     except requests.exceptions.ConnectionError as error:
         print(error, "Ошибка соединения")
         sleep(15)
