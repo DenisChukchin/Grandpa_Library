@@ -34,9 +34,10 @@ The following parameters are available for the script:
 
 One of the possible commands to use the script:
 ```bash
-% python3 parse_tululu_category.py
+% python3 parse_tululu_category.py --start_page 700 --end_page
 ```
-<img width="1078" alt="image" src="https://github.com/DenisChukchin/Grandpa_Library/assets/125466667/ffebfe20-b6ff-42c7-878b-2df189b76cd0">
+<img width="1045" alt="image" src="https://github.com/DenisChukchin/Grandpa_Library/assets/125466667/a128d822-7d0b-45a4-8dac-5c405a0f7cf7">
+
 
 ## Project goals.
 *The program was designed by a student from online web development courses for educational purposes [Devman](https://dvmn.org).*
