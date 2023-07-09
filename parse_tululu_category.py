@@ -76,11 +76,19 @@ def main():
         last_page = [(int(soup.select('.npage')[-1].text) + 1)
                      if not end_page else end_page][0]
         for page in range(start_page, last_page):
-            category_page_url = urljoin(science_fiction, f'{page}')
-            soup = get_response_from_url(category_page_url)
-            book_urls.extend(get_book_urls(url, soup))
+            try:
+                category_page_url = urljoin(science_fiction, f'{page}')
+                soup = get_response_from_url(category_page_url)
+                book_urls.extend(get_book_urls(url, soup))
+            except requests.exceptions.HTTPError as error:
+                print(f'Проблема со страницей: {error}')
+            except requests.exceptions.ConnectionError as error:
+                print(error, "Ошибка соединения")
+                sleep(15)
+            except requests.exceptions.ReadTimeout:
+                print("Превышено время ожидания...")
     except requests.exceptions.HTTPError:
-        print('В указанном промежутке отсутствуют страницы.')
+        print('Проблема на стартовой странице')
     except requests.exceptions.ConnectionError as error:
         print(error, "Ошибка соединения")
         sleep(15)
