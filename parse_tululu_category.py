@@ -8,16 +8,16 @@ from parse_tululu import parse_book_page, get_response_from_url
 from parse_tululu import download_image, download_txt
 
 
-def get_page_url(url, soup):
+def get_book_urls(url, soup):
     id_tags = soup.select('.d_book .bookimage a')
-    page_url = [urljoin(url, id_tag['href']) for id_tag in id_tags]
-    return page_url
+    book_urls = [urljoin(url, id_tag['href']) for id_tag in id_tags]
+    return book_urls
 
 
-def save_books_as_json_file(books_description, folder):
+def save_books_as_json_file(book_descriptions, folder):
     os.makedirs(folder, exist_ok=True)
     with open(os.path.join(folder, 'BOOKS'), 'w', encoding='utf8') as json_file:
-        json.dump(books_description, json_file, ensure_ascii=False)
+        json.dump(book_descriptions, json_file, ensure_ascii=False)
 
 
 def parse_args():
@@ -69,7 +69,7 @@ def main():
     txt_url = urljoin(url, 'txt.php')
 
     start_page, end_page, user_folder, skip_img, skip_txt = parse_args()
-    page_urls = []
+    book_urls = []
     try:
         start_page_url = urljoin(science_fiction, f'{start_page}')
         soup = get_response_from_url(start_page_url)
@@ -78,7 +78,7 @@ def main():
         for page in range(start_page, last_page):
             category_page_url = urljoin(science_fiction, f'{page}')
             soup = get_response_from_url(category_page_url)
-            page_urls.extend(get_page_url(url, soup))
+            book_urls.extend(get_book_urls(url, soup))
     except requests.exceptions.HTTPError:
         print('В указанном промежутке отсутствуют страницы.')
     except requests.exceptions.ConnectionError as error:
@@ -87,12 +87,12 @@ def main():
     except requests.exceptions.ReadTimeout:
         print("Превышено время ожидания...")
 
-    books_description = []
-    for page_url in page_urls:
-        id_number = page_url.split('b')[1].split('/')[0]
+    book_descriptions = []
+    for book_url in book_urls:
+        id_number = book_url.split('b')[1].split('/')[0]
         try:
-            soup = get_response_from_url(page_url)
-            book_page = parse_book_page(soup, page_url)
+            soup = get_response_from_url(book_url)
+            book_page = parse_book_page(soup, book_url)
             if not skip_img:
                 if 'nopic.gif' not in book_page['picture_link']:
                     image_path = download_image(id_number, book_page['picture_link'],
@@ -106,7 +106,7 @@ def main():
                                         folder=f'{user_folder}/books/')
             else:
                 txt_path = 'Вы отменили скачивание книг'
-            books_description.append({
+            book_descriptions.append({
                 'title': book_page['title'],
                 'author': book_page['author'],
                 'img_src': image_path,
@@ -122,10 +122,10 @@ def main():
         except requests.exceptions.ReadTimeout:
             print("Превышено время ожидания...")
 
-    save_books_as_json_file(books_description,
+    save_books_as_json_file(book_descriptions,
                             folder=f'{user_folder}/books as json/')
-    print(f'Всего скачано книг: {len(books_description)}')
-    if not len(books_description):
+    print(f'Всего скачано книг: {len(book_descriptions)}')
+    if not len(book_descriptions):
         print('Перепроверь вводимые параметры. Поможет --help.')
 
 
