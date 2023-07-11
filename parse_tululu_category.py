@@ -69,24 +69,11 @@ def main():
     txt_url = urljoin(url, 'txt.php')
 
     start_page, end_page, user_folder, skip_img, skip_txt = parse_args()
-    book_urls = []
+    start_page_url = urljoin(science_fiction, f'{start_page}')
+    start_page_soup = []
     try:
-        start_page_url = urljoin(science_fiction, f'{start_page}')
         soup = get_response_from_url(start_page_url)
-        last_page = [(int(soup.select('.npage')[-1].text) + 1)
-                     if not end_page else end_page][0]
-        for page in range(start_page, last_page):
-            try:
-                category_page_url = urljoin(science_fiction, f'{page}')
-                soup = get_response_from_url(category_page_url)
-                book_urls.extend(get_book_urls(url, soup))
-            except requests.exceptions.HTTPError as error:
-                print(f'Проблема со страницей: {error}')
-            except requests.exceptions.ConnectionError as error:
-                print(error, "Ошибка соединения")
-                sleep(15)
-            except requests.exceptions.ReadTimeout:
-                print("Превышено время ожидания...")
+        start_page_soup.append(soup)
     except requests.exceptions.HTTPError:
         print('Проблема на стартовой странице')
     except requests.exceptions.ConnectionError as error:
@@ -94,6 +81,22 @@ def main():
         sleep(15)
     except requests.exceptions.ReadTimeout:
         print("Превышено время ожидания...")
+
+    last_page = [(int(start_page_soup[0].select('.npage')[-1].text) + 1)
+                 if not end_page else end_page][0]
+    book_urls = []
+    for page in range(start_page, last_page):
+        category_page_url = urljoin(science_fiction, f'{page}')
+        try:
+            soup = get_response_from_url(category_page_url)
+            book_urls.extend(get_book_urls(url, soup))
+        except requests.exceptions.HTTPError as error:
+            print(f'Проблема со страницей: {error}')
+        except requests.exceptions.ConnectionError as error:
+            print(error, "Ошибка соединения")
+            sleep(15)
+        except requests.exceptions.ReadTimeout:
+            print("Превышено время ожидания...")
 
     book_descriptions = []
     for book_url in book_urls:
