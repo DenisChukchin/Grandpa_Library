@@ -20,7 +20,7 @@ The following parameters are available for the script:
 
 User need to specify books interval by command:
 ```bash
-% python3 main.py 20 30
+% python3 render_website.py 20 30
 ```
 <img width="1392" alt="image" src="https://github.com/DenisChukchin/Grandpa_Library/assets/125466667/607cadc0-f8e9-4dd9-876b-243401a63e09">
 

@@ -49,9 +49,10 @@ def download_txt(number, url, filename, folder):
     response.raise_for_status()
     check_for_redirect(response.history)
     txt_path = os.path.join(folder, f'{number}.{filename}.txt')
+    txt_folder = f'/books/{number}.{filename}.txt'
     with open(txt_path, 'wb') as file:
         file.write(response.content)
-    return txt_path
+    return txt_folder
 
 
 def download_image(number, picture_link, folder):
@@ -61,9 +62,10 @@ def download_image(number, picture_link, folder):
     check_for_redirect(response.history)
     picture_extension = get_extension_from_url(picture_link)
     image_path = os.path.join(folder, f'{number}{picture_extension}')
+    image_folder = f'/images/{number}{picture_extension}'
     with open(image_path, 'wb') as file:
         file.write(response.content)
-    return image_path
+    return image_folder
 
 
 def get_extension_from_url(url):

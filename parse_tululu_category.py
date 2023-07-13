@@ -37,7 +37,7 @@ def parse_args():
                              'Указать номер страницы: --start_page 700 '
                              'Значение по умолчанию: параметр отсутствует.',
                         metavar='Id книги - целое число.')
-    parser.add_argument('--end_page', type=int, nargs='?', const=None, default=2,
+    parser.add_argument('--end_page', type=int, nargs='?', const=None, default=5,
                         help='Номер страницы после которой закончится загрузка. '
                              'Указать номер страницы: --end_page 701 '
                              'Значение по умолчанию: параметр отсутствует. '
