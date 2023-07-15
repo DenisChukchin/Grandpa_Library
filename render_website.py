@@ -13,20 +13,23 @@ def read_json_file(folder):
 
 
 def on_reload():
+    os.makedirs('pages', exist_ok=True)
     book_descriptions = read_json_file(folder='books as json/')
-    chunked_books = list(chunked(book_descriptions, 2))
+    books_per_page = list(chunked(book_descriptions, 10))
 
     env = Environment(
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])
     )
     template = env.get_template('template.html')
-    rendered_page = template.render(
-        chunked_books=chunked_books
-    )
 
-    with open('index.html', 'w', encoding="utf8") as file:
-        file.write(rendered_page)
+    for page_number, books in enumerate(books_per_page, 1):
+        chunked_books = list(chunked(books, 2))
+        rendered_page = template.render(
+            chunked_books=chunked_books
+        )
+        with open(f'pages/index{page_number}.html', 'w', encoding="utf8") as file:
+            file.write(rendered_page)
 
 
 if __name__ == '__main__':
