@@ -13,6 +13,40 @@
   <body>
     <h1>Hello, world!</h1>
 
+    <nav aria-label="Search results pages">
+      <ul class="pagination justify-content-center">
+        {% if current_page == 1 %}
+          <li class="page-item disabled">
+            <a class="page-link" href="../pages/index{{ current_page - 1 }}.html" tabindex="-1" >Назад</a>
+          </li>
+        {% else %}
+          <li class="page-item">
+            <a class="page-link" href="../pages/index{{ current_page - 1 }}.html" tabindex="-1" >Назад</a>
+          </li>
+        {% endif %}
+          {% for page_number in range(1, total_pages + 1) %}
+            {% if page_number == current_page %}
+            <li class="page-item active">
+              <a class="page-link" href="../pages/index{{page_number}}.html">{{page_number}}</a>
+            </li>
+            {% else %}
+              <li class="page-item">
+                <a class="page-link" href="../pages/index{{page_number}}.html">{{page_number}}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+            {% if current_page == total_pages %}
+              <li class="page-item disabled">
+                <a class="page-link" href="../pages/index{{ current_page + 1 }}.html" tabindex="-1" >Вперёд</a>
+              </li>
+            {% else %}
+              <li class="page-item">
+                <a class="page-link" href="../pages/index{{ current_page + 1 }}.html" tabindex="-1" >Вперёд</a>
+              </li>
+            {% endif %}
+         </ul>
+     </nav>
+
     <div class="container">
       <div class="row">
         {% for book_descriptions in chunked_books %}
@@ -22,9 +56,9 @@
                 <div class="row no-gutters">
                   <div class="col-md-4">
                     {% if book_description.img_src.startswith('/') %}
-                      <img src='{{book_description.img_src|urlencode}}' class="card-img" alt="Cover {{book_description.title}}">
+                      <img src='..{{book_description.img_src|urlencode}}' class="card-img" alt="Cover {{book_description.title}}">
                     {% else %}
-                      <img src="images/nopic.gif" class="card-img" alt="empty book cover">
+                      <img src="../images/nopic.gif" class="card-img" alt="empty book cover">
                     {% endif %}
                   </div>
                   <div class="col-md-8">
@@ -34,7 +68,7 @@
                       {% if book_description.book_path.startswith('Вы') %}
                         <p class="card-text">Книга отсутствует</p>
                       {% else %}
-                        <p><a href="{{book_description.book_path|urlencode}}" target="_blank">Читать</a><p>
+                        <p><a href="..{{book_description.book_path|urlencode}}" target="_blank">Читать</a><p>
                       {% endif %}
                     </div>
                   </div>
