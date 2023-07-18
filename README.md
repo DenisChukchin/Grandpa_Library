@@ -2,6 +2,8 @@
 The first script is downloading book covers and books from [the website](https://tululu.org) as txt file and shows on the terminal authors, titles , genres and reviews.
 
 The second script is downloading book covers and books from [category: Science fiction](https://tululu.org/l55/). Authors, titles, genres and reviews will be saved as a json file on your device.
+
+The third script running the website [Grandpa Library](https://denischukchin.github.io/Grandpa_Library/pages/index1.html) on localhost, simulating a library, based on the books that were downloaded before.
 ## Installation.
 Install Python3 latest version. Install PyCharm IDE, if you need it.
 > To isolate the project, I'd recommend to use a virtual environment model. [vertualenv/venv](https://docs.python.org/3/library/venv.html).
@@ -38,6 +40,17 @@ One of the possible commands to use the script:
 ```
 <img width="1045" alt="image" src="https://github.com/DenisChukchin/Grandpa_Library/assets/125466667/a128d822-7d0b-45a4-8dac-5c405a0f7cf7">
 
+### render_website.py  
+The script launches a simple website with books (even without internet connection). The site will display book titles, authors, genres and book covers. You can start reading the book by following the link 'Читать'.
 
+All data downloaded by __parse_tululu_category.py__ should be stored in the main folder of this script.
+
+To launch website use this command:
+```bash
+% python3 render_website.py  
+```
++ Then check your site: [localhost](http://127.0.0.1:5500)
+
+> To see an example of what the site looks like, follow the link: [Grandpa Library](https://denischukchin.github.io/Grandpa_Library/pages/index1.html)
 ## Project goals.
 *The program was designed by a student from online web development courses for educational purposes [Devman](https://dvmn.org).*
