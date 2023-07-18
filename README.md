@@ -43,8 +43,6 @@ One of the possible commands to use the script:
 ### render_website.py  
 The script launches a simple website with books (even without internet connection). The site will display book titles, authors, genres and book covers. You can start reading the book by following the link 'Читать'.
 
-All data downloaded by __parse_tululu_category.py__ should be stored in the main folder of this script.
-
 To launch website use this command:
 ```bash
 % python3 render_website.py  
@@ -52,5 +50,8 @@ To launch website use this command:
 + Then check your site: [localhost](http://127.0.0.1:5500)
 
 > To see an example of what the site looks like, follow the link: [Grandpa Library](https://denischukchin.github.io/Grandpa_Library/pages/index1.html)
+
+<img width="1336" alt="image" src="https://github.com/DenisChukchin/Grandpa_Library/assets/125466667/ee4d8128-b410-40a4-8b00-3d5c1e7503b0">
+
 ## Project goals.
 *The program was designed by a student from online web development courses for educational purposes [Devman](https://dvmn.org).*
