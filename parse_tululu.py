@@ -48,8 +48,8 @@ def download_txt(number, url, filename, folder):
     response = requests.get(url, params=params)
     response.raise_for_status()
     check_for_redirect(response.history)
-    txt_path = os.path.join(folder, f'{number}.{filename}.txt')
-    txt_folder = f'/media/books/{number}.{filename}.txt'
+    txt_path = os.path.join(folder, f'{number}_{filename}.txt')
+    txt_folder = f'/media/books/{number}_{filename}.txt'
     with open(txt_path, 'wb') as file:
         file.write(response.content)
     return txt_folder

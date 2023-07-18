@@ -63,7 +63,7 @@
                     {% if book_description.img_src.startswith('/') %}
                       <img src='..{{book_description.img_src|urlencode}}' class="card-img" alt="Cover {{book_description.title}}">
                     {% else %}
-                      <img src="../images/nopic.gif" class="card-img" alt="empty book cover">
+                      <img src="../static/nopic.gif" class="card-img" alt="empty book cover">
                     {% endif %}
                   </div>
                   <div class="col-md-8">
