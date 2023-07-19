@@ -72,9 +72,7 @@
                       <p class="card-text">{{book_description.author}}</p>
                       <h6><span class="badge badge-light">{{book_description.genres[0]}}</span></h6>
                       <h6><span class="badge badge-light">{{book_description.genres[1]}}</span></h6>
-                      {% if book_description.book_path.startswith("Вы") %}
-                        <p class="card-text">Книга отсутствует</p>
-                      {% else %}
+                      {% if book_description.book_path.startswith("/") %}
                         <p><a href="..{{book_description.book_path|urlencode}}" target="_blank">Читать</a><p>
                       {% endif %}
                     </div>
