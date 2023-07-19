@@ -6,12 +6,6 @@ from livereload import Server
 from more_itertools import chunked
 
 
-def read_json_file(folder):
-    with open(folder, encoding='utf8') as json_file:
-        books_json = json.load(json_file)
-    return books_json
-
-
 def parse_args():
     parser = argparse.ArgumentParser(
         description='Программа запускает простой сайт с книжками. '
@@ -34,7 +28,8 @@ def on_reload():
     os.makedirs('pages', exist_ok=True)
     json_path = parse_args()
 
-    book_descriptions = read_json_file(folder=json_path)
+    with open(json_path, encoding='utf8') as json_file:
+        book_descriptions = json.load(json_file)
     books_per_page = list(chunked(book_descriptions, 10))
 
     env = Environment(
