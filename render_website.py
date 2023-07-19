@@ -7,10 +7,9 @@ from more_itertools import chunked
 
 
 def read_json_file(folder):
-    with open(folder, 'r') as json_file:
-        books_json = json_file.read()
-    books = json.loads(books_json)
-    return books
+    with open(folder, encoding='utf8') as json_file:
+        books_json = json.load(json_file)
+    return books_json
 
 
 def parse_args():
