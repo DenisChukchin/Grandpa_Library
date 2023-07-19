@@ -1,20 +1,41 @@
 import os
 import json
+import argparse
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from livereload import Server
 from more_itertools import chunked
 
 
 def read_json_file(folder):
-    with open(os.path.join(folder, 'BOOKS'), 'r') as json_file:
+    with open(folder, 'r') as json_file:
         books_json = json_file.read()
     books = json.loads(books_json)
     return books
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Программа запускает простой сайт с книжками. '
+                    'На сайте будут отображены названия книг, авторы, '
+                    'жанр и обложки книг. Пройдя по ссылке "читать" - '
+                    'откроется книга в новой вкладке. '
+    )
+    parser.add_argument('--json_path', type=str,
+                        default='books as json/BOOKS',
+                        help='Введите путь до файла json, в котором '
+                             'хранится информация о скаченных книгах. '
+                             'По умолчанию json файл находится в папке '
+                             'с программой.',
+                        metavar='Путь до файла json.')
+    args = parser.parse_args()
+    return args.json_path
+
+
 def on_reload():
     os.makedirs('pages', exist_ok=True)
-    book_descriptions = read_json_file(folder='books as json/')
+    json_path = parse_args()
+
+    book_descriptions = read_json_file(folder=json_path)
     books_per_page = list(chunked(book_descriptions, 10))
 
     env = Environment(
