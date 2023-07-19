@@ -3,7 +3,7 @@ The first script is downloading book covers and books from [the website](https:/
 
 The second script is downloading book covers and books from [category: Science fiction](https://tululu.org/l55/). Authors, titles, genres and reviews will be saved as a json file on your device.
 
-The third script running the website [Grandpa Library](https://denischukchin.github.io/Grandpa_Library/pages/index1.html) on localhost, simulating a library, based on the books that were downloaded before.
+The third script is needed to launch a website [Grandpa Library](https://denischukchin.github.io/Grandpa_Library/pages/index1.html) on localhost that simulates a library based on books that were downloaded earlier.
 ## Installation.
 Install Python3 latest version. Install PyCharm IDE, if you need it.
 > To isolate the project, I'd recommend to use a virtual environment model. [vertualenv/venv](https://docs.python.org/3/library/venv.html).
