@@ -60,8 +60,8 @@
               <div class="card mb-3" style="max-width: 540px;">
                 <div class="row no-gutters">
                   <div class="col-md-4">
-                    {% if book_description.img_src.startswith('/') %}
-                      <img src='..{{book_description.img_src|urlencode}}' class="card-img" alt="Cover {{book_description.title}}">
+                    {% if book_description.img_src.startswith("/") %}
+                      <img src="..{{book_description.img_src|urlencode}}" class="card-img" alt="Cover {{book_description.title}}">
                     {% else %}
                       <img src="../static/nopic.gif" class="card-img" alt="empty book cover">
                     {% endif %}
@@ -72,7 +72,7 @@
                       <p class="card-text">{{book_description.author}}</p>
                       <h6><span class="badge badge-light">{{book_description.genres[0]}}</span></h6>
                       <h6><span class="badge badge-light">{{book_description.genres[1]}}</span></h6>
-                      {% if book_description.book_path.startswith('Вы') %}
+                      {% if book_description.book_path.startswith("Вы") %}
                         <p class="card-text">Книга отсутствует</p>
                       {% else %}
                         <p><a href="..{{book_description.book_path|urlencode}}" target="_blank">Читать</a><p>

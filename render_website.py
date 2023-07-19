@@ -8,35 +8,35 @@ from more_itertools import chunked
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='Программа запускает простой сайт с книжками. '
-                    'На сайте будут отображены названия книг, авторы, '
-                    'жанр и обложки книг. Пройдя по ссылке "читать" - '
-                    'откроется книга в новой вкладке. '
+        description="Программа запускает простой сайт с книжками. "
+                    "На сайте будут отображены названия книг, авторы, "
+                    "жанр и обложки книг. Пройдя по ссылке 'читать' - "
+                    "откроется книга в новой вкладке. "
     )
-    parser.add_argument('--json_path', type=str,
-                        default='books as json/BOOKS',
-                        help='Введите путь до файла json, в котором '
-                             'хранится информация о скаченных книгах. '
-                             'По умолчанию json файл находится в папке '
-                             'с программой.',
-                        metavar='Путь до файла json.')
+    parser.add_argument("--json_path", type=str,
+                        default="books as json/BOOKS",
+                        help="Введите путь до файла json, в котором "
+                             "хранится информация о скаченных книгах. "
+                             "По умолчанию json файл находится в папке "
+                             "с программой.",
+                        metavar="Путь до файла json.")
     args = parser.parse_args()
     return args.json_path
 
 
 def on_reload():
-    os.makedirs('pages', exist_ok=True)
+    os.makedirs("pages", exist_ok=True)
     json_path = parse_args()
 
-    with open(json_path, encoding='utf8') as json_file:
+    with open(json_path, encoding="utf8") as json_file:
         book_descriptions = json.load(json_file)
     books_per_page = list(chunked(book_descriptions, 10))
 
     env = Environment(
-        loader=FileSystemLoader('.'),
-        autoescape=select_autoescape(['html', 'xml'])
+        loader=FileSystemLoader("."),
+        autoescape=select_autoescape(["html", "xml"])
     )
-    template = env.get_template('template.html')
+    template = env.get_template("template.html")
 
     for page_number, books in enumerate(books_per_page, 1):
         chunked_books = list(chunked(books, 2))
@@ -45,12 +45,12 @@ def on_reload():
             current_page=page_number,
             total_pages=len(books_per_page)
         )
-        with open(f'pages/index{page_number}.html', 'w', encoding="utf8") as file:
+        with open(f"pages/index{page_number}.html", "w", encoding="utf8") as file:
             file.write(rendered_page)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     on_reload()
     server = Server()
-    server.watch('template.html', on_reload)
-    server.serve(root='.', default_filename='pages/index1.html')
+    server.watch("template.html", on_reload)
+    server.serve(root=".", default_filename="pages/index1.html")
